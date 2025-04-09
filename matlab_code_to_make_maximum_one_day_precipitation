@@ -1,0 +1,34 @@
+%%% maximum storm%%%
+clc;
+clear all;
+aa=importdata('modified_list_of_dams_as_per_imd_with_location.txt');
+aa1=aa.textdata;
+aa2=aa.data;
+storm2=[];
+for i=1:length(aa1)
+    disp(i);
+    fname=char(aa1(i,1));
+    data=dlmread(['dam_area_average_as_per_imd_latest/',fname]);
+    storm=max(data(:,4));
+    storm1=[string(fname) aa2(i,1) aa2(i,2) storm];
+    storm2=[storm2;storm1];
+end
+cc1=importdata('modified_list_of_dam_with_location.txt');
+cc2=cc1.textdata;
+cc3=cc1.data;
+cc=[170;1095;1104;1105;1106;1107;1200;5546;5671;5680];
+ct=cc2(cc,:);
+cd=cc3(cc,:);
+storm5=[];
+for j=1:length(ct)
+    disp(j);
+    fname1=char(ct(j,1));
+    data1=dlmread(['/DATA1/mayank_data/Mayank_Ai_system_data/era-5_dam_objective-1_work/era-5_dam_area_average_forcing/',fname1]);
+    storm3=max(data1(:,4));
+    storm4=[string(fname1) cd(j,1) aa2(j,2) storm3];
+    storm5=[storm5;storm4];
+end
+max_storm=[storm2;storm5];
+max_storm1=str2double(max_storm);
+dlmwrite(['/media/hydromonitoring/Expansion/objective_1_paper/imd_climate_indices/climatic_indices_separate_files/','imd_era_5_mix_dam_maximum_storm'],max_storm1(:,[2:4]),' ');
+

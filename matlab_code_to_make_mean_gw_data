@@ -1,0 +1,19 @@
+clc;
+clear all;
+aa=dir('area_avearge_gw/');
+aa4=[];
+for i=3:length(aa)
+    aa3=[]; aa1=[];
+    aa2=[];
+    disp(i);
+    fname=aa(i).name;
+    aa1=dlmread(['area_avearge_gw/',fname]);
+    aa2=mean(aa1(:,3),'omitnan');
+    aa3=[string(fname) aa2];
+    aa4=[aa4;aa3];
+end
+bb=readtable('Final_dam_lat_lon_for_gw.txt');
+bb1=table2cell(bb);
+cc=string(bb1);
+pp=[cc aa4];
+pp1=str2double(pp(:,[2 3 5]));

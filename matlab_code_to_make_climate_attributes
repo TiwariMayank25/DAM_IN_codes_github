@@ -1,0 +1,148 @@
+clc
+clear all
+% code for extracting precipitation data basin wise
+%fname=dir('/DATA1/mayank_data/dam_trend_related_work/useful_material/Extra_text_file/dam_area_average_as_per_imd_latest/');
+aa=importdata('/DATA1/mayank_data/dam_trend_related_work/useful_material/Extra_text_file/modified_list_of_dams_as_per_imd_with_location.txt');
+aa1=aa.textdata;
+aa2=aa.data;
+st_name=[];
+output1=[];
+final_output=[];
+for b=1:length(aa1)
+    disp(b)
+    k1=[];
+    k=[];
+        n=char(aa1(b,1));
+        data1=dlmread(['/DATA1/mayank_data/dam_trend_related_work/useful_material/Extra_text_file/dam_area_average_as_per_imd_latest/',n]);
+        
+        aa=find(data1(:,1)>=1951 & data1(:,1)<=2019);
+        data=data1(aa,:);
+        
+
+        th95=5*nanmean(data(:,4));
+        th5=1;
+        rr=find(data(:,4)>=th95);
+        ny=data(end,1)-data(1,1)+1;
+        high_p_fr=length(rr)/ny;
+        z=find(data(:,4)<th5);
+        low_p_fr=length(z)/ny;
+        %% timing
+        w=find(data(:,2)>=1 & data(:,2)<=2);
+        pre=find(data(:,2)>=3 & data(:,2)<=5);
+        mons=find(data(:,2)>=6 & data(:,2)<=9);
+        post=find(data(:,2)>=10 & data(:,2)<=12);
+        % high
+        wh=find(data(w,4)>=th95);
+        high_p_s(1,1)=length(wh)/ny;
+        preh=find(data(pre,4)>=th95);
+        high_p_s(1,2)=length(preh)/ny;
+        monh=find(data(mons,4)>=th95);
+        high_p_s(1,3)=length(monh)/ny;
+        posth=find(data(post,4)>=th95);
+        high_p_s(1,4)=length(posth)/ny;
+        [m,pos]=max(high_p_s);
+        %dry
+        wl=find(data(w,4)<th5);
+        low_p_s(1,1)=length(wl)/ny;
+        prel=find(data(pre,4)<th5);
+        low_p_s(1,2)=length(prel)/ny;
+        monl=find(data(mons,4)<th5);
+        low_p_s(1,3)=length(monl)/ny;
+        postl=find(data(post,4)<th5);
+        low_p_s(1,4)=length(postl)/ny;
+        [m1,pos1]=max(low_p_s);
+        %mean
+        p_mean=mean(data(:,4),1);
+        tmax_mean=mean(data(:,5),1);
+        tmin_mean=mean(data(:,6),1);
+        %High precipitation spells
+        clm=4;
+        x=data;
+        data_negative_index = find( x(:,clm)>th95);
+        index_derivative = [1; diff(data_negative_index);];
+        step_change_point = find(index_derivative > 1);
+
+        negative_begin_index = [data_negative_index(1); data_negative_index(step_change_point);];
+        negative_end_index = [data_negative_index(step_change_point-1);data_negative_index(end);];
+        index_vector = [1:length(x(:,clm))]';
+        k=[negative_begin_index, negative_end_index, negative_end_index-negative_begin_index+1];
+        %% low precipitation spells
+        clm=4;
+        x1=data;
+        data_negative_index1 = find( x1(:,clm)<th5);
+        index_derivative1 = [1; diff(data_negative_index1);];
+        step_change_point1 = find(index_derivative1 > 1);
+
+        negative_begin_index1 = [data_negative_index1(1); data_negative_index1(step_change_point1);];
+        negative_end_index1 = [data_negative_index1(step_change_point1-1);data_negative_index1(end);];
+        index_vector1 = [1:length(x1(:,clm))]';
+        k1=[negative_begin_index1, negative_end_index1, negative_end_index1-negative_begin_index1+1];
+       
+        output=[string(n) aa2(b,1) aa2(b,2) p_mean tmax_mean tmin_mean high_p_fr low_p_fr pos pos1 mean(k(:,3)) mean(k1(:,3))];
+        % st_name=[st_name; AET Smroot Smsurf];
+    output1=[output1;output];
+   
+end
+%mmmm=readtable('/DATA1/mayank_data/dam_trend_related_work/useful_material/Extra_text_file/modified_list_of_dams_as_per_imd_with_location.txt');
+%ppp=table2cell(mmmm);
+%oooo=string(ppp);
+%final_output=[oooo output1];
+final_output1=str2double(output1);
+final_output2=final_output1(:,[2:12]);
+
+%%%%%%%%%%%%%%% aridityity%%%
+%fname=dir('/DATA1/mayank_data/dam_trend_related_work/useful_material/Extra_text_file/dam_area_average_as_per_imd_latest/');
+for bb=1:length(aa1)
+    disp(bb)
+bb1=char(aa1(bb,1));
+    data=dlmread(['/DATA1/mayank_data/dam_trend_related_work/useful_material/Extra_text_file/dam_area_average_as_per_imd_latest/',bb1]);
+    data1=dlmread(['/DATA1/mayank_data/dam_trend_related_work/useful_material/Extra_text_file/dam_pet_area_average_as_per_imd/',bb1]);
+    for i=1951:2019
+        a=find(data(:,1)==i);
+        c=find(data1(:,1)==i);
+        rainfall(i-1950,1)=sum(data(a,4));
+        rainfall(i-1950,2)=sum(data1(c,3));
+    end
+    ARIDITY(bb,1)=(mean(rainfall(:,1))/mean(rainfall(:,2)));
+    
+end
+%%%%%%%%%%%%%%%%%%%%% seasonality%%%%%
+basin_sea=[];
+ for bbb=1:length(aa1)
+     disp(bbb);
+bb2=char(aa1(bbb,1));
+     ans1=dlmread(['/DATA1/mayank_data/dam_trend_related_work/useful_material/Extra_text_file/dam_area_average_as_per_imd_latest/',bb2]);
+     
+     m=bb2;
+      n=1;
+      xx=[];
+    for yy=1951:2019
+        for mm=1:12
+            a=find(ans1(:,1)==yy & ans1(:,2)==mm);
+            out(n,1)=yy;
+            out(n,2)=mm;
+            out(n,3)=mean(ans1(a,4));
+                     
+            n=n+1;
+        end
+        r1=sum(out);
+        r=r1(1,3);
+        s=0;
+        for i=1:12
+            a=(out(i,3)-(r/12));
+            s=s+a;
+        end
+        seas=s/r;
+        x(:,1)=yy;
+        x(:,2)=seas;
+        xx=[xx;x];
+    end
+    seasonality=mean(abs(xx(:,2)));
+     basin_sea=[basin_sea;seasonality];
+   
+ end
+ final_result=[final_output2 ARIDITY basin_sea];
+ dlmwrite('result_climatic_indices_attribute',final_result,' ');
+
+
+
