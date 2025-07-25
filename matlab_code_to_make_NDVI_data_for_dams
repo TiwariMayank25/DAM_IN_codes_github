@@ -1,0 +1,27 @@
+clc 
+ clear all
+ fname=dir("new_area_average_NDVI/");
+ndvi_data=[];
+ for i=3:length(fname)
+     disp(i)
+     data1=dlmread(['new_area_average_NDVI/',fname(i).name]); 
+data2=find(data1(:,1)>1981 & data1(:,1)<2020);
+data=data1(data2,:);
+     a=find(data(:,2)==1 | data(:,2)==2 | data(:,2)==12);
+     b=find(data(:,2)==3 | data(:,2)==4 | data(:,2)==5);
+     c=find(data(:,2)==6 | data(:,2)==7 | data(:,2)==8);
+     d=find(data(:,2)==9 | data(:,2)==10 | data(:,2)==11);
+     djf=data(a,4);
+     mpm=data(b,4);
+     jja=data(c,4);
+     son=data(d,4);
+     final=[string(fname(i).name) nanmean(djf) nanmean(mpm) nanmean(jja) nanmean(son)];
+     ndvi_data=[ndvi_data;final];
+ end
+ mmmm=readtable('final_DAM_list_of_all_lat_lon.txt');
+ppp=table2cell(mmmm);
+oooo=string(ppp);
+final_output=[oooo ndvi_data];
+final_output1=str2double(final_output);
+final_output2=final_output1(:,[2 3 5:8]);
+ dlmwrite('new_result_dam_NDVI_output',final_output2,' ');
